@@ -7,79 +7,37 @@
 namespace lhft::book {
     class ComparablePrice {
     public:
-        ComparablePrice(bool buy_side, Price price) : price_(price), buy_side_(buy_side) {
-        }
+        ComparablePrice(bool buy_side, Price price);
 
-        [[nodiscard]] auto Matches(Price rhs) const -> bool {
-            if (price_ == rhs) {
-                return true;
-            }
-            if (buy_side_) {
-                return rhs < price_ || price_ == MARKET_ORDER_PRICE;
-            }
-            return price_ < rhs || rhs == MARKET_ORDER_PRICE;
-        }
+        [[nodiscard]] auto Matches(Price rhs) const -> bool;
 
-        auto operator<(Price rhs) const -> bool {
-            if (price_ == MARKET_ORDER_PRICE) {
-                return rhs != MARKET_ORDER_PRICE;
-            } else if (rhs == MARKET_ORDER_PRICE) {
-                return false;
-            } else if (buy_side_) {
-                return rhs < price_;
-            } else {
-                return price_ < rhs;
-            }
-        }
+        auto operator<(Price rhs) const -> bool;
 
-        auto operator==(Price rhs) const -> bool {
-            return price_ == rhs;
-        }
+        auto operator==(Price rhs) const -> bool;
 
-        auto operator!=(Price rhs) const -> bool {
-            return price_ != rhs;
-        }
+        auto operator!=(Price rhs) const -> bool;
 
-        auto operator>(Price rhs) const -> bool {
-            return price_ != MARKET_ORDER_PRICE &&
-                   ((rhs == MARKET_ORDER_PRICE) || (buy_side_ ? (rhs > price_) : (price_ > rhs)));
-        }
+        auto operator>(Price rhs) const -> bool;
 
-        auto operator<=(Price rhs) const -> bool {
-            return *this < rhs || *this == rhs;
-        }
+        auto operator<=(Price rhs) const -> bool;
 
-        auto operator>=(Price rhs) const -> bool {
-            return *this > rhs || *this == rhs;
-        }
+        auto operator>=(Price rhs) const -> bool;
 
-        auto operator<(const ComparablePrice& rhs) const -> bool {
-            return *this < rhs.price_;
-        }
+        auto operator<(const ComparablePrice& rhs) const -> bool;
 
-        auto operator==(const ComparablePrice& rhs) const -> bool {
-            return *this == rhs.price_;
-        }
+        auto operator==(const ComparablePrice& rhs) const -> bool;
 
-        auto operator!=(const ComparablePrice& rhs) const -> bool {
-            return *this != rhs.price_;
-        }
+        auto operator!=(const ComparablePrice& rhs) const -> bool;
 
-        auto operator>(const ComparablePrice& rhs) const -> bool {
-            return *this > rhs.price_;
-        }
+        auto operator>(const ComparablePrice& rhs) const -> bool;
 
-        [[nodiscard]] auto GetPrice() const -> Price {
-            return price_;
-        }
+        [[nodiscard]] auto GetPrice() const -> Price;
 
-        [[nodiscard]] auto IsBuy() const -> bool {
-            return buy_side_;
-        }
+        [[nodiscard]] auto IsBuy() const -> bool;
 
-        [[nodiscard]] auto IsMarket() const -> bool {
-            return price_ == MARKET_ORDER_PRICE;
-        }
+        [[nodiscard]] auto IsMarket() const -> bool;
+
+        friend std::ostream &operator<<(std::ostream &os, const ComparablePrice &price);
 
     private:
         Price price_;
@@ -108,15 +66,5 @@ namespace lhft::book {
 
     inline auto operator>=(Price price, const ComparablePrice& key) -> bool {
         return key <= price;
-    }
-
-    inline auto operator<<(std::ostream& out, const ComparablePrice& key) -> std::ostream& {
-        out << (key.IsBuy() ? "Buy at " : "Sell at ");
-        if (key.IsMarket()) {
-            out << "Market";
-        } else {
-            out << key.GetPrice();
-        }
-        return out;
     }
 }    // namespace lhft::book

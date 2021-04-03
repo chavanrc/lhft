@@ -9,8 +9,7 @@ namespace lhft::book {
     public:
         using DepthTracker = Depth<SIZE>;
 
-        explicit DepthOrderBook(Symbol symbol = 0) : OrderBook<OrderPtr>{symbol} {
-        }
+        explicit DepthOrderBook(Symbol symbol = 0);
 
         DepthTracker& GetDepth() {
             return depth_;
@@ -21,43 +20,20 @@ namespace lhft::book {
         }
 
     protected:
-        void OnAccept(const OrderPtr& order, Quantity quantity) {
-            if (order->IsLimit()) {
-                if (quantity == order->OrderQty()) {
-                    depth_.IgnoreFillQty(quantity, order->IsBuy());
-                } else {
-                    depth_.AddOrder(order->GetPrice(), order->OrderQty(), order->IsBuy());
-                }
-            }
-        }
+        void OnAccept(const OrderPtr& order, Quantity quantity);
 
         void OnFill(const OrderPtr& order, const OrderPtr& matched_order, Quantity quantity, Cost fill_cost,
-                    bool inbound_order_filled, bool matched_order_filled) {
-            if (matched_order->IsLimit()) {
-                depth_.FillOrder(matched_order->GetPrice(), quantity, matched_order_filled, matched_order->IsBuy());
-            }
-            if (order->IsLimit()) {
-                depth_.FillOrder(order->GetPrice(), quantity, inbound_order_filled, order->IsBuy());
-            }
-        }
+                    bool inbound_order_filled, bool matched_order_filled);
 
-        void OnCancel(const OrderPtr& order, Quantity quantity) {
-            if (order->IsLimit()) {
-                depth_.CloseOrder(order->GetPrice(), quantity, order->IsBuy());
-            }
-        }
+        void OnCancel(const OrderPtr& order, Quantity quantity);
 
-        void OnReplace(const OrderPtr& order, Quantity current_qty, Quantity new_qty, Price new_price) {
-            // TODO
-        }
+        void OnReplace(const OrderPtr& order, Quantity current_qty, Quantity new_qty, Price new_price);
 
-        void OnOrderBookChange() {
-            if (depth_.Changed()) {
-                depth_.Published();
-            }
-        }
+        void OnOrderBookChange();
 
     private:
         DepthTracker depth_;
     };
 }    // namespace lhft::book
+
+#include "../src/depth_order_book.inl"
