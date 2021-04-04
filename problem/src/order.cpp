@@ -143,8 +143,8 @@ namespace lhft::book {
     std::ostream &operator<<(std::ostream &os, const Order &order) {
         os << "[#" << order.GetOrderId();
         os << ' ' << (order.IsBuy() ? "BUY" : "SELL");
-        os << ' ' << order.OrderQty();
         os << ' ' << order.GetSymbol();
+        os << ' ' << order.OrderQty();
         if (order.GetPrice() == 0) {
             os << " MKT";
         } else {

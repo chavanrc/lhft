@@ -80,7 +80,7 @@ namespace lhft::book {
         }
 
         friend std::ostream &operator<<(std::ostream &os, const StateChange &change) {
-            os /*<< "state_: " << change.state_*/ << " description_: " << change.description_;
+            os /*<< "State: " << change.state_*/ << " Description: " << change.description_;
             return os;
         }
     };
