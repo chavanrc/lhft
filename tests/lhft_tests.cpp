@@ -1,4 +1,5 @@
 #define CATCH_CONFIG_RUNNER
+#define CATCH_CONFIG_ENABLE_BENCHMARKING
 #include <catch2/catch.hpp>
 #include <fstream>
 #include <market.hpp>

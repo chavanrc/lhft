@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 
+#include "logger.hpp"
 #include "callback.hpp"
 #include "order_tracker.hpp"
 #include "types.hpp"
@@ -96,4 +97,4 @@ namespace lhft::book {
     };
 }    // namespace lhft::book
 
-#include "../src/order_book.inl"
+#include "order_book.inl"

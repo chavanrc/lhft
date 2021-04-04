@@ -1,8 +1,9 @@
+#include <logger.hpp>
 #include <market.hpp>
 
 namespace lhft::me {
     auto Market::AddBook(Symbol symbol) -> bool {
-        std::cout << "Create new depth order book for " << symbol << '\n';
+        LOG_INFO("Create new depth order book for " << symbol);
         auto [iter, inserted] = books_.insert_or_assign(symbol, std::make_shared<OrderBook>(symbol));
         return inserted;
     }
@@ -32,25 +33,25 @@ namespace lhft::me {
     auto Market::OrderSubmit(const OrderPtr &order) -> bool {
         bool result = false;
         if (!order) {
-            std::cout << "Invalid order ref.\n";
+            LOG_ERROR("Invalid order ref.");
             return result;
         }
         auto symbol = order->GetSymbol();
         auto book   = FindBook(symbol);
         if (!book) {
-            std::cout << "Symbol: " << symbol << "book not found.\n";
+            LOG_ERROR("Symbol: " << symbol << "book not found.");
             return result;
         }
         auto order_id = order->GetOrderId();
-        std::cout << "ADDING order: " << *order << '\n';
+        LOG_INFO("ADDING order: " << *order);
         auto [iter, inserted] = orders_.insert_or_assign(order_id, order);
         if (inserted && book->Add(order)) {
-            std::cout << order_id << " matched\n";
+            LOG_INFO(order_id << " matched");
             for (const auto &event : order->GetTrades()) {
                 OrderPtr     matched_order;
                 OrderBookPtr matched_book;
                 if (FindExistingOrder(event.matched_order_id_, matched_order, matched_book)) {
-                    if(matched_order->QuantityOnMarket() == 0) {
+                    if (matched_order->QuantityOnMarket() == 0) {
                         RemoveOrder(matched_order->GetOrderId());
                     }
                 }
@@ -67,7 +68,7 @@ namespace lhft::me {
         OrderBookPtr book   = nullptr;
         bool         result = false;
         if (FindExistingOrder(order_id, order, book)) {
-            std::cout << "Requesting Cancel: " << *order << '\n';
+            LOG_INFO("Requesting Cancel: " << *order);
             book->Cancel(order);
             result = RemoveOrder(order_id);
         }
@@ -81,7 +82,7 @@ namespace lhft::me {
     auto Market::FindExistingOrder(OrderId order_id, OrderPtr &order, OrderBookPtr &book) -> bool {
         auto order_position = orders_.find(order_id);
         if (order_position == orders_.end()) {
-            std::cout << "--Can't find OrderID #" << order_id << '\n';
+            LOG_ERROR("--Can't find OrderID #" << order_id);
             return false;
         }
 
@@ -89,7 +90,7 @@ namespace lhft::me {
         auto symbol = order->GetSymbol();
         book        = FindBook(symbol);
         if (!book) {
-            std::cout << "--No order book for symbol " << symbol << '\n';
+            LOG_ERROR("--No order book for symbol " << symbol);
             return false;
         }
         return true;

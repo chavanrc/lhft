@@ -1,3 +1,4 @@
+#define CATCH_CONFIG_ENABLE_BENCHMARKING
 #include <catch2/catch.hpp>
 #include <iostream>
 #include <market.hpp>
@@ -118,4 +119,108 @@ TEST_CASE("multiple matching order test", "[unit]") {
     REQUIRE(market->OrderSubmit(std::make_shared<lhft::book::Order>(order_id++, false, symbol, 10, 1025)));
     REQUIRE(market->OrderSubmit(std::make_shared<lhft::book::Order>(order_id++, true, symbol, 10, 1025)));
     market->Log();
+}
+
+TEST_CASE("me benchmark test", "[unit]") {
+    auto               market = std::make_unique<lhft::me::Market>();
+    lhft::book::Symbol symbol = 1;
+    BENCHMARK("benchmark add book") {
+        market->AddBook(symbol);
+    };
+
+    BENCHMARK("benchmark add/remove book") {
+        market->AddBook(symbol);
+        market->RemoveBook(1);
+    };
+
+    BENCHMARK("benchmark add order") {
+        auto                 market   = std::make_unique<lhft::me::Market>();
+        lhft::book::Symbol   symbol   = 1;
+        lhft::book::OrderId  order_id = 1;
+        bool                 is_buy   = true;
+        lhft::book::Quantity quantity = 1;
+        lhft::book::Price    price    = 1;
+        auto                 order    = std::make_shared<lhft::book::Order>(order_id, is_buy, symbol, quantity, price);
+        market->AddBook(symbol);
+        market->OrderSubmit(order);
+        market->RemoveBook(symbol);
+    };
+
+    BENCHMARK("benchmark fill order book") {
+        auto                 market   = std::make_unique<lhft::me::Market>();
+        lhft::book::Symbol   symbol   = 1;
+        lhft::book::OrderId  order_id = 1;
+        bool                 is_buy   = true;
+        lhft::book::Quantity quantity = 1;
+        lhft::book::Price    price    = 1;
+        market->AddBook(symbol);
+
+        std::random_device                     random_device;
+        std::mt19937                           random_engine(random_device());
+        std::uniform_int_distribution<int32_t> distribution_1_5(1, 5);
+
+        // Buy
+        for (int32_t i = 0; i < 5; i++) {
+            auto random_number = distribution_1_5(random_engine);
+            for (int32_t j = 0; j < random_number; j++) {
+                quantity   = distribution_1_5(random_engine);
+                auto order = std::make_shared<lhft::book::Order>(order_id++, is_buy, symbol, quantity, price);
+                market->OrderSubmit(order);
+            }
+            ++price;
+        }
+
+        // Sell
+        for (int32_t i = 0; i < 5; i++) {
+            auto random_number = distribution_1_5(random_engine);
+            for (int32_t j = 0; j < random_number; j++) {
+                quantity   = distribution_1_5(random_engine);
+                auto order = std::make_shared<lhft::book::Order>(order_id++, !is_buy, symbol, quantity, price);
+                market->OrderSubmit(order);
+            }
+            ++price;
+        }
+        market->RemoveBook(symbol);
+    };
+
+    BENCHMARK("benchmark cancel order") {
+        auto                 market   = std::make_unique<lhft::me::Market>();
+        lhft::book::Symbol   symbol   = 1;
+        lhft::book::OrderId  order_id = 1;
+        bool                 is_buy   = true;
+        lhft::book::Quantity quantity = 1;
+        lhft::book::Price    price    = 1;
+        auto                 order    = std::make_shared<lhft::book::Order>(order_id, is_buy, symbol, quantity, price);
+        market->AddBook(symbol);
+        market->OrderSubmit(order);
+        market->OrderCancel(order_id);
+        market->RemoveBook(symbol);
+    };
+
+    BENCHMARK("benchmark random matching") {
+        auto                 market   = std::make_unique<lhft::me::Market>();
+        lhft::book::Symbol   symbol   = 1;
+        lhft::book::OrderId  order_id = 1;
+        bool                 is_buy   = true;
+        lhft::book::Quantity quantity = 1;
+        lhft::book::Price    price    = 1;
+        market->AddBook(symbol);
+
+        std::random_device                     random_device;
+        std::mt19937                           random_engine(random_device());
+        std::uniform_int_distribution<int32_t> distribution_1_10(1, 10);
+
+        for (int32_t i = 0; i < 10; i++) {
+            auto random_number = distribution_1_10(random_engine);
+            for (int32_t j = 0; j < random_number; j++) {
+                quantity        = distribution_1_10(random_engine);
+                price           = distribution_1_10(random_engine);
+                auto buy_order  = std::make_shared<lhft::book::Order>(order_id++, is_buy, symbol, quantity, price);
+                auto sell_order = std::make_shared<lhft::book::Order>(order_id++, !is_buy, symbol, quantity, price);
+                market->OrderSubmit(buy_order);
+                market->OrderSubmit(sell_order);
+            }
+        }
+        market->RemoveBook(symbol);
+    };
 }

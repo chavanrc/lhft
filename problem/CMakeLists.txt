@@ -1,15 +1,41 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 
-project(matching_engine)
+project(MatchingEngine LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-file(GLOB HEADER_FILES include/*.hpp)
+include(GNUInstallDirs)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
+
+if (${BENCHMARK_ENABLED})
+    add_definitions(-DBENCHMARK_ENABLE)
+endif ()
+
+file(GLOB HEADER_FILES include/*.hpp include/*.inl)
 
 file(GLOB SOURCE_FILES src/*.cpp)
 
 add_library(${PROJECT_NAME} STATIC ${HEADER_FILES} ${SOURCE_FILES})
 
-#add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
+target_include_directories(${PROJECT_NAME} PRIVATE include ${CMAKE_INCLUDE_PATH})
 
-target_include_directories(${PROJECT_NAME} PRIVATE include)
+target_include_directories(${PROJECT_NAME} INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        PUBLIC_HEADER "${HEADER_FILES}")
+
+install(TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}-targets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(EXPORT ${PROJECT_NAME}-targets
+        NAMESPACE ${PROJECT_NAME}::
+        FILE ${PROJECT_NAME}Config.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})

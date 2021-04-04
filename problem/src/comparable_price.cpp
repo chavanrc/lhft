@@ -76,7 +76,6 @@ namespace lhft::book {
     }
 
     std::ostream &operator<<(std::ostream &os, const ComparablePrice &price) {
-        //os << (price.IsBuy() ? "Buy at " : "Sell at ");
         os << "at ";
         if (price.IsMarket()) {
             os << "Market";

@@ -221,13 +221,13 @@ namespace lhft::book {
     template <class OrderPtr>
     auto OrderBook<OrderPtr>::OnAccept(const OrderPtr &order, Quantity quantity) -> void {
         order->OnAccepted();
-        std::cout << "Event: Accepted: " << *order << '\n';
+        LOG_INFO("Event: Accepted: " << *order);
     }
 
     template <class OrderPtr>
     auto OrderBook<OrderPtr>::OnReject(const OrderPtr &order, const char *reason) -> void {
         order->OnRejected(reason);
-        std::cout << "Event: Rejected: " << *order << ' ' << reason << '\n';
+        LOG_INFO("Event: Rejected: " << *order << ' ' << reason);
     }
 
     template <class OrderPtr>
@@ -241,7 +241,7 @@ namespace lhft::book {
             << fill_cost << ' ' << *order;
         out << (matched_order->IsBuy() ? " Bought: " : " Sold: ") << fill_qty << " Shares for " << fill_cost << ' '
             << *matched_order;
-        std::cout << out.str() << '\n';
+        LOG_INFO(out.str());
 
         order->AddTradeHistory(fill_qty, matched_order->QuantityOnMarket(), fill_cost, matched_order->GetOrderId(),
                                matched_order->GetPrice(), fill_id);
@@ -252,13 +252,13 @@ namespace lhft::book {
     template <class OrderPtr>
     auto OrderBook<OrderPtr>::OnCancel(const OrderPtr &order, Quantity quantity) -> void {
         order->OnCancelled();
-        std::cout << "Event: Canceled: " << *order;
+        LOG_INFO("Event: Canceled: " << *order);
     }
 
     template <class OrderPtr>
     auto OrderBook<OrderPtr>::OnCancelReject(const OrderPtr &order, const char *reason) -> void {
         order->OnCancelRejected(reason);
-        std::cout << "Event: Cancel Reject: " << *order << ' ' << reason << '\n';
+        LOG_INFO("Event: Cancel Reject: " << *order << ' ' << reason);
     }
 
     template <class OrderPtr>
@@ -299,9 +299,9 @@ namespace lhft::book {
                     try {
                         PerformCallback(cb);
                     } catch (const std::exception &ex) {
-                        std::cerr << "Caught exception during callback: " << ex.what() << '\n';
+                        LOG_ERROR("Caught exception during callback: " << ex.what());
                     } catch (...) {
-                        std::cerr << "Caught unknown exception during callback" << '\n';
+                        LOG_ERROR("Caught unknown exception during callback");
                     }
                 }
                 working_callbacks_.clear();
@@ -369,14 +369,14 @@ namespace lhft::book {
 
     template <class OrderPtr>
     void OrderBook<OrderPtr>::Log() const {
-        std::cout << "Symbol " << symbol_ << '\n';
-        std::cout << "Market Price " << market_price_ << '\n';
+        LOG_INFO("Symbol " << symbol_);
+        LOG_INFO("Market Price " << market_price_);
         for (auto ask = asks_.rbegin(); ask != asks_.rend(); ++ask) {
-            std::cout << "  Ask " << ask->second.OpenQty() << " @ " << ask->first << '\n';
+            LOG_INFO("  Ask " << ask->second.OpenQty() << " @ " << ask->first);
         }
 
         for (auto bid = bids_.begin(); bid != bids_.end(); ++bid) {
-            std::cout << "  Bid " << bid->second.OpenQty() << " @ " << bid->first << '\n';
+            LOG_INFO("  Bid " << bid->second.OpenQty() << " @ " << bid->first);
         }
     }
 }    // namespace lhft::book
