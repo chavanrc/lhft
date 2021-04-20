@@ -4,8 +4,8 @@
 #include <map>
 #include <vector>
 
-#include "logger.hpp"
 #include "callback.hpp"
+#include "logger.hpp"
 #include "order_tracker.hpp"
 #include "types.hpp"
 
@@ -87,12 +87,12 @@ namespace lhft::book {
         auto OnTrade(const OrderBook *book, const OrderId &id_1, const OrderId &id_2, Quantity qty, Price price,
                      bool buyer_maker) -> void;
 
-        Symbol     symbol_;
-        TrackerMap bids_;
-        TrackerMap asks_;
+        Symbol     symbol_{0};
+        TrackerMap bids_{};
+        TrackerMap asks_{};
         Price      market_price_{MARKET_ORDER_PRICE};
-        Callbacks  callbacks_;
-        Callbacks  working_callbacks_;
+        Callbacks  callbacks_{};
+        Callbacks  working_callbacks_{};
         bool       handling_callbacks_{false};
     };
 }    // namespace lhft::book

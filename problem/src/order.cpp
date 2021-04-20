@@ -2,7 +2,7 @@
 
 namespace lhft::book {
     Order::Order(OrderId id, bool buy_side, Symbol symbol, Quantity quantity, Price price)
-            : id_{id}, buy_side_{buy_side}, symbol_{symbol}, quantity_{quantity}, price_{price} {
+        : id_{id}, buy_side_{buy_side}, symbol_{symbol}, quantity_{quantity}, price_{price} {
     }
 
     auto Order::GetOrderId() const -> OrderId {
@@ -86,16 +86,15 @@ namespace lhft::book {
         history_.emplace_back(State::FILLED, msg.str());
     }
 
-    auto
-    Order::AddTradeHistory(Quantity fill_qty, Quantity remaining_qty, Cost fill_cost, const OrderId &matched_order_id,
-                           Price price, FillId fill_id) -> void {
+    auto Order::AddTradeHistory(Quantity fill_qty, Quantity remaining_qty, Cost fill_cost,
+                                const OrderId &matched_order_id, Price price, FillId fill_id) -> void {
         MatchedTrade res{};
-        res.matched_order_id_ = matched_order_id;
-        res.fill_cost_ = fill_cost;
-        res.quantity_ = fill_qty;
-        res.price_ = price;
+        res.matched_order_id_   = matched_order_id;
+        res.fill_cost_          = fill_cost;
+        res.quantity_           = fill_qty;
+        res.price_              = price;
         res.quantity_on_market_ = remaining_qty;
-        res.fill_id_ = fill_id;
+        res.fill_id_            = fill_id;
         trades_.emplace_back(res);
     }
 
@@ -125,15 +124,15 @@ namespace lhft::book {
     }
 
     auto Order::GetOrderData(OrderData &order_data, State state, const std::string &reason) -> void {
-        order_data.id_ = GetOrderId();
-        order_data.buy_side_ = IsBuy();
-        order_data.symbol_ = Symbol();
-        order_data.quantity_ = OrderQty();
-        order_data.price_ = GetPrice();
-        order_data.quantity_filled_ = QuantityFilled();
-        order_data.fill_cost_ = FillCost();
+        order_data.id_                 = GetOrderId();
+        order_data.buy_side_           = IsBuy();
+        order_data.symbol_             = Symbol();
+        order_data.quantity_           = OrderQty();
+        order_data.price_              = GetPrice();
+        order_data.quantity_filled_    = QuantityFilled();
+        order_data.fill_cost_          = FillCost();
         order_data.quantity_on_market_ = QuantityOnMarket();
-        auto cur_state = CurrentState();
+        auto cur_state                 = CurrentState();
         if (cur_state) {
             order_data.state_ = cur_state->state_;
         }

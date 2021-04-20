@@ -1,10 +1,10 @@
 #pragma once
 
+#include <optional>
 #include <ostream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <optional>
 
 #include "types.hpp"
 
@@ -24,59 +24,57 @@ namespace lhft::book {
         UNKNOWN
     };
 
-    enum TickType : char {
-        ORDER_TICK = 'O', TRADE_EVENT_TICK = 'T', BOOK_UPDATE = 'B', BOOK_CHANGE = 'C'
-    };
+    enum TickType : char { ORDER_TICK = 'O', TRADE_EVENT_TICK = 'T', BOOK_UPDATE = 'B', BOOK_CHANGE = 'C' };
 
     struct StreamHeader {
-        size_t seq_no_;
-        TickType message_type_;
+        size_t   seq_no_{0};
+        TickType message_type_{};
     };
 
     struct OrderData {
-        StreamHeader stream_header_;
-        OrderId id_;
-        bool buy_side_;
-        Symbol symbol_;
-        Quantity quantity_;
-        Price price_;
-        Quantity quantity_filled_;
-        Quantity quantity_on_market_;
-        Cost fill_cost_;
-        State state_;
-        std::string reason_;
+        StreamHeader stream_header_{};
+        OrderId      id_{0};
+        bool         buy_side_{};
+        Symbol       symbol_{0};
+        Quantity     quantity_{0};
+        Price        price_{0};
+        Quantity     quantity_filled_{0};
+        Quantity     quantity_on_market_{0};
+        Cost         fill_cost_{0};
+        State        state_{};
+        std::string  reason_{};
     };
 
     struct TradeData {
-        StreamHeader stream_header_;
-        OrderId buyer_id_;
-        OrderId seller_id_;
-        Symbol symbol_;
-        Quantity quantity_;
-        Price price_;
-        bool buyer_maker_;
-        FillId fill_id_;
+        StreamHeader stream_header_{};
+        OrderId      buyer_id_{0};
+        OrderId      seller_id_{0};
+        Symbol       symbol_{0};
+        Quantity     quantity_{0};
+        Price        price_{0};
+        bool         buyer_maker_{};
+        FillId       fill_id_{0};
     };
 
-    template<int32_t SIZE = BOOK_DEPTH>
+    template <int32_t SIZE = BOOK_DEPTH>
     struct BookData {
-        StreamHeader stream_header_;
-        Symbol symbol_;
+        StreamHeader               stream_header_{};
+        Symbol                     symbol_{0};
         std::pair<Price, Quantity> bids_[SIZE];
         std::pair<Price, Quantity> asks_[SIZE];
     };
 
     struct BookChange {
-        StreamHeader stream_header_;
-        Symbol symbol_;
+        StreamHeader stream_header_{};
+        Symbol       symbol_{0};
     };
 
     struct StateChange {
-        State state_{State::UNKNOWN};
+        State       state_{State::UNKNOWN};
         std::string description_{};
 
         explicit StateChange(State state, const std::string &description = "")
-                : state_(state), description_(description) {
+            : state_(state), description_(description) {
         }
 
         friend std::ostream &operator<<(std::ostream &os, const StateChange &change) {
@@ -86,18 +84,18 @@ namespace lhft::book {
     };
 
     struct MatchedTrade {
-        OrderId matched_order_id_;
-        Cost fill_cost_;
-        Quantity quantity_;
-        Quantity quantity_on_market_;
-        Price price_;
-        FillId fill_id_;
+        OrderId  matched_order_id_{0};
+        Cost     fill_cost_{0};
+        Quantity quantity_{0};
+        Quantity quantity_on_market_{0};
+        Price    price_{0};
+        FillId   fill_id_{0};
     };
 
     class Order {
     public:
         using History = std::vector<StateChange>;
-        using Trades = std::vector<MatchedTrade>;
+        using Trades  = std::vector<MatchedTrade>;
 
         Order(OrderId id, bool buy_side, Symbol symbol, Quantity quantity, Price price);
 
@@ -155,16 +153,16 @@ namespace lhft::book {
         [[nodiscard]] auto IsVerbose() const -> bool;
 
     private:
-        OrderId id_;
-        bool buy_side_;
-        Symbol symbol_;
-        Quantity quantity_;
-        Price price_;
+        OrderId  id_{0};
+        bool     buy_side_{};
+        Symbol   symbol_{0};
+        Quantity quantity_{0};
+        Price    price_{0};
         Quantity quantity_filled_{0};
         Quantity quantity_on_market_{0};
-        Cost fill_cost_{0};
-        History history_;
-        Trades trades_;
-        bool verbose_{false};
+        Cost     fill_cost_{0};
+        History  history_{};
+        Trades   trades_{};
+        bool     verbose_{false};
     };
 }    // namespace lhft::book

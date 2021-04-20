@@ -8,13 +8,13 @@
 namespace lhft::me {
     class Market {
     public:
-        using OrderId           = book::OrderId;
-        using Symbol            = book::Symbol;
-        using OrderPtr          = std::shared_ptr<book::Order>;
-        using OrderBook         = book::OrderBook<OrderPtr>;
-        using OrderBookPtr      = std::shared_ptr<OrderBook>;
-        using OrderMap          = std::unordered_map<OrderId, OrderPtr>;
-        using SymbolToBookMap   = std::unordered_map<Symbol, OrderBookPtr>;
+        using OrderId         = book::OrderId;
+        using Symbol          = book::Symbol;
+        using OrderPtr        = std::shared_ptr<book::Order>;
+        using OrderBook       = book::OrderBook<OrderPtr>;
+        using OrderBookPtr    = std::shared_ptr<OrderBook>;
+        using OrderMap        = std::unordered_map<OrderId, OrderPtr>;
+        using SymbolToBookMap = std::unordered_map<Symbol, OrderBookPtr>;
 
         auto AddBook(Symbol symbol) -> bool;
 
@@ -33,7 +33,7 @@ namespace lhft::me {
         auto Log() const -> void;
 
     private:
-        OrderMap        orders_;
-        SymbolToBookMap books_;
+        OrderMap        orders_{};
+        SymbolToBookMap books_{};
     };
 }    // namespace lhft::me

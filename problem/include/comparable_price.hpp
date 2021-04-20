@@ -37,7 +37,7 @@ namespace lhft::book {
 
         [[nodiscard]] auto IsMarket() const -> bool;
 
-        friend std::ostream &operator<<(std::ostream &os, const ComparablePrice &price);
+        friend std::ostream& operator<<(std::ostream& os, const ComparablePrice& price);
 
     private:
         Price price_;

@@ -23,8 +23,8 @@ namespace lhft::book {
         auto Ptr() -> OrderPtr&;
 
     private:
-        OrderPtr order_;
-        Quantity open_qty_;
+        OrderPtr order_{nullptr};
+        Quantity open_qty_{0};
     };
 }    // namespace lhft::book
 
